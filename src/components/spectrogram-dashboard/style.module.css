@@ -23,6 +23,12 @@
   letter-spacing: 0;
 }
 
+.eyebrow {
+  color: var(--element-neutral-color);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
 .layout {
   display: grid;
   min-height: 0;
@@ -35,7 +41,7 @@
   display: flex;
   min-height: 0;
   flex-direction: column;
-  gap: var(--gap);  
+  gap: var(--gap);
 }
 
 .widget,
@@ -49,10 +55,20 @@
   padding: var(--gap);
 }
 
+.widget-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
 .widget {
   min-height: 26rem;
   flex: 1;
   gap: var(--gap);
+
+  &.attention {
+    grid-column: 1 / -1;
+  }
 }
 
 .actions {
