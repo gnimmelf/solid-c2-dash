@@ -19,6 +19,8 @@ declare module "virtual:file-routes" {
   export interface FileRouteEntry {
     path: string;
     page?: boolean;
+    /** The page component is a server function; its `$component` is delivered eagerly. */
+    server?: boolean;
     $component?: FileRouteLazyRef<any> | FileRouteEagerRef<any>;
     $$route?: FileRouteEagerRef<any>;
     [key: string]: unknown;
@@ -33,16 +35,16 @@ declare module "virtual:file-routes" {
   /** The flat route manifest, in scan order. */
   const routes: readonly [
     {
-      path: "/";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/index")>;
-      $$route?: undefined;
-    },
-    {
       path: "/*404";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/[...404]")>;
       $$route: FileRouteEagerRef<typeof import("./src/routes/[...404]")>;
+    },
+    {
+      path: "/";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/index")>;
+      $$route?: undefined;
     },
     {
       path: "/pages/channel-api";
