@@ -1,7 +1,7 @@
 import { Title } from "@solidjs/meta";
-import { Loading } from "solid-js";
+import { Loading, onSettled } from "solid-js";
 import { paths, Router } from "./router";
-import { getTheme, setTheme, ThemeNames } from "./lib/theme";
+import { getTheme, setTheme, startThemeSync, ThemeNames } from "./lib/theme";
 import "@oicl/openbridge-webcomponents/dist/openbridge.css";
 import "./global.css";
 import styles from "./App.module.css";
@@ -10,6 +10,8 @@ import  "@oicl/openbridge-webcomponents/dist/components/icon-button/icon-button"
 import  "@oicl/openbridge-webcomponents/dist/icons/icon-palette-dimming";
 
 export default function App() {
+  onSettled(() => startThemeSync());
+
   const cycleThemes = () => {
     const currentIndex = ThemeNames.indexOf(getTheme());
     setTheme(ThemeNames[(currentIndex + 1) % ThemeNames.length]);

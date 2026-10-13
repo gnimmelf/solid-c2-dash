@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as v from "valibot";
-import { WindowChannelRegistry } from "./registry";
+import { WindowChannelRegistry } from "./registry.ts";
 
 class MemoryBroadcastChannel extends EventTarget {
   static groups = new Map<string, Set<MemoryBroadcastChannel>>();

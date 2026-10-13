@@ -1,12 +1,6 @@
 import { createSignal, onSettled, Show, untrack } from "solid-js";
 import * as v from "valibot";
 import { WindowChannelRegistry } from "../../lib/window-channel";
-import {
-  getTheme,
-  setTheme,
-  THEME_CHANGE_EVENT,
-  type ThemeName,
-} from "../../lib/theme";
 import Spectrogram from "../spectrogram";
 import {
   SpectrogramChannelSchemas,
@@ -31,7 +25,7 @@ export default function SpectrogramWidget() {
     window.location.href,
     {
       schemas: SpectrogramChannelSchemas,
-      schemaVersion: "2",
+      schemaVersion: "3",
       state: {
         schema: SpectrogramStateSchema,
         getSnapshot: () =>
@@ -39,7 +33,6 @@ export default function SpectrogramWidget() {
             assetId: assetId(),
             running: running(),
             colormap: colormap(),
-            theme: getTheme(),
             spectrumSource: spectrumSource(),
           })),
         applySnapshot: (state) => {
@@ -47,7 +40,6 @@ export default function SpectrogramWidget() {
           setAssetId(snapshot.assetId);
           setRunning(snapshot.running);
           setColormap(snapshot.colormap);
-          setTheme(snapshot.theme, false);
           setSpectrumSource(snapshot.spectrumSource);
         },
       },
@@ -60,19 +52,11 @@ export default function SpectrogramWidget() {
         setRunning(message.data.running);
         setColormap(message.data.colormap);
         setSpectrumSource(message.data.spectrumSource);
-      } else if (message.type === "theme") {
-        setTheme(message.data.theme, false);
       }
     });
-    const handleThemeChange = (event: Event) => {
-      const theme = (event as CustomEvent<ThemeName>).detail;
-      void channel.broadcast("theme", { theme });
-    };
-    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
     const disconnect = channel.connect();
     return () => {
       unsubscribe();
-      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
       disconnect();
     };
   });

@@ -13,7 +13,7 @@ import {
   RegistryType,
   RejectedSchema,
   SnapshotSchema,
-} from "./schemas";
+} from "./schemas.ts";
 import type {
   Peer,
   PendingAcknowledgment,
