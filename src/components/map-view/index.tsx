@@ -1,4 +1,4 @@
-import { onSettled } from "solid-js";
+import { createEffect, createMemo, createSignal, onCleanup, onSettled } from "solid-js";
 import { ScatterplotLayer } from "@deck.gl/layers";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import {
@@ -10,6 +10,7 @@ import {
 import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import "maplibre-gl/dist/maplibre-gl.css";
 import styles from "./style.module.css";
+import { getTheme, THEME_CHANGE_EVENT } from "../../lib/theme";
 
 type Detection = {
   coordinates: [number, number];
@@ -17,37 +18,63 @@ type Detection = {
 };
 
 const detections: Detection[] = [
-  { coordinates: [-122.42, 37.81], intensity: 0.92 },
-  { coordinates: [-122.39, 37.79], intensity: 0.76 },
-  { coordinates: [-122.45, 37.78], intensity: 0.63 },
-  { coordinates: [-122.4, 37.76], intensity: 0.88 },
-  { coordinates: [-122.37, 37.77], intensity: 0.55 },
-  { coordinates: [-122.43, 37.74], intensity: 0.7 },
-  { coordinates: [-122.35, 37.8], intensity: 0.46 },
-  { coordinates: [-122.47, 37.82], intensity: 0.58 },
-  { coordinates: [-122.32, 37.78], intensity: 0.84 },
-  { coordinates: [-122.38, 37.72], intensity: 0.67 },
-  { coordinates: [-122.29, 37.75], intensity: 0.51 },
-  { coordinates: [-122.33, 37.71], intensity: 0.79 },
+  { coordinates: [10.4852, 59.4294], intensity: 0.92 },
+  { coordinates: [10.4864, 59.4299], intensity: 0.76 },
+  { coordinates: [10.4843, 59.4288], intensity: 0.63 },
+  { coordinates: [10.4871, 59.4290], intensity: 0.88 },
+  { coordinates: [10.4858, 59.4282], intensity: 0.55 },
+  { coordinates: [10.4839, 59.4297], intensity: 0.7 },
+  { coordinates: [10.4880, 59.4304], intensity: 0.46 },
+  { coordinates: [10.4848, 59.4306], intensity: 0.58 },
+  { coordinates: [10.4868, 59.4284], intensity: 0.84 },
+  { coordinates: [10.4829, 59.4292], intensity: 0.67 },
+  { coordinates: [10.4877, 59.4280], intensity: 0.51 },
+  { coordinates: [10.4835, 59.4303], intensity: 0.79 },
 ];
 
 export default function MapView() {
   let mapElement: HTMLDivElement | undefined;
+
+  const [localTheme, setLocalTheme] = createSignal(getTheme());
+
+  const handleThemeChange = () => setLocalTheme(getTheme());
+  window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+  onCleanup(() => window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange));
+
+  const themedProps = createMemo(() => {
+    const theme = localTheme();
+    return {
+      mapStyle:
+        theme === "day" || theme === "bright"
+          ? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
+          : "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
+    };
+  });
+
+  let libreMap: MapLibreMap | undefined;
+
+  createEffect(
+    () => themedProps().mapStyle,
+    (mapStyle) => {
+      libreMap?.setStyle(mapStyle);
+    },
+  );
 
   onSettled(() => {
     if (!mapElement) return;
 
     setWorkerUrl(mapLibreWorkerUrl);
 
-    const map = new MapLibreMap({
+    const initialMapInstance = new MapLibreMap({
       container: mapElement,
-      style: "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json",
-      center: [-122.39, 37.77],
+      style: themedProps().mapStyle,
+      center: [10.4851, 59.41565],
       zoom: 11,
       pitch: 42,
       bearing: -18,
       attributionControl: false,
     });
+    libreMap = initialMapInstance;
 
     const overlay = new MapboxOverlay({
       layers: [
@@ -72,15 +99,16 @@ export default function MapView() {
       ],
     });
 
-    map.addControl(overlay);
-    map.addControl(
+    libreMap.addControl(overlay);
+    libreMap.addControl(
       new NavigationControl({ showCompass: true }),
       "top-right",
     );
-    map.addControl(new AttributionControl({ compact: true }));
+    libreMap.addControl(new AttributionControl({ compact: true }));
 
     return () => {
-      map.remove();
+      initialMapInstance.remove();
+      if (libreMap === initialMapInstance) libreMap = undefined;
     };
   });
 
