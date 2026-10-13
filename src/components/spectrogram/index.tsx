@@ -110,6 +110,10 @@ export default function Spectrogram(props: SpectrogramProps) {
       class={styles.spectrogram}
       data-attention-level={attentionLevel()}
     >
+      <div class={styles.heading}>
+        <strong>{props.assetId}</strong>
+        <span>L{attentionLevel()} · {spectrumSource.status()}</span>
+      </div>
       <Show when={attentionLevel() >= 2}>
         <div class={styles.controls}>
           <obc-toggle-button-group
@@ -160,11 +164,6 @@ export default function Spectrogram(props: SpectrogramProps) {
           </Show>
         </div>
       </Show>
-
-      <div class={styles.heading}>
-        <strong>{props.assetId}</strong>
-        <span>L{attentionLevel()} · {spectrumSource.status()}</span>
-      </div>
       <Show when={spectrumSource.error()}>
         <p class={styles.error} role="alert">{spectrumSource.error()}</p>
       </Show>

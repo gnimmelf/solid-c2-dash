@@ -1,0 +1,64 @@
+.root {
+  --gap: var(--default-gap, 1rem);
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--gap);
+  border-bottom: 1px solid var(--border-outline-color);
+  padding-bottom: var(--gap);
+}
+
+.header h1,
+.widget h2,
+.context h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.eyebrow {
+  color: var(--element-neutral-color);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+}
+
+.overview {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+.widget,
+.context {
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  justify-content: flex-start;
+  border: 1px solid var(--border-outline-color);
+  background: var(--container-background-color);
+  padding: var(--gap);
+}
+
+.widget-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap);
+}
+
+.widget {
+  min-height: 26rem;
+  flex: 1;
+  gap: var(--gap);
+
+  &.attention {
+    grid-column: 1 / -1;
+  }
+}

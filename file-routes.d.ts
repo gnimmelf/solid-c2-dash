@@ -47,27 +47,21 @@ declare module "virtual:file-routes" {
       $$route?: undefined;
     },
     {
-      path: "/pages/channel-api";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/channel-api")>;
-      $$route?: undefined;
-    },
-    {
       path: "/pages/";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/pages/index")>;
       $$route?: undefined;
     },
     {
-      path: "/pages/spectrogram-dashboard";
+      path: "/pages/l3-spectrogram-workspace";
       page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-dashboard")>;
+      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l3-spectrogram-workspace")>;
       $$route?: undefined;
     },
     {
-      path: "/pages/spectrogram-detail";
+      path: "/pages/l1-l2-spectrogram-dashboard";
       page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-detail")>;
+      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l1-l2-spectrogram-dashboard")>;
       $$route?: undefined;
     }
   ];
@@ -100,26 +94,18 @@ declare module "virtual:file-routes" {
       children?: undefined;
     },
     {
-      path: "/pages/channel-api";
-      id: "/pages/channel-api";
+      path: "/pages/l3-spectrogram-workspace";
+      id: "/pages/l3-spectrogram-workspace";
       page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/channel-api")>;
+      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l3-spectrogram-workspace")>;
       $$route?: undefined;
       children?: undefined;
     },
     {
-      path: "/pages/spectrogram-detail";
-      id: "/pages/spectrogram-detail";
+      path: "/pages/l1-l2-spectrogram-dashboard";
+      id: "/pages/l1-l2-spectrogram-dashboard";
       page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-detail")>;
-      $$route?: undefined;
-      children?: undefined;
-    },
-    {
-      path: "/pages/spectrogram-dashboard";
-      id: "/pages/spectrogram-dashboard";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-dashboard")>;
+      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l1-l2-spectrogram-dashboard")>;
       $$route?: undefined;
       children?: undefined;
     }

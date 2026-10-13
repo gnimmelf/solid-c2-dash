@@ -18,14 +18,14 @@ import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
 import styles from "./style.module.css";
 import { AudioSource } from "../spectrogram/spectrum-source";
 
-export default function SpectrogramDashboard() {
+export default function SpectrogramWidget() {
   const [attentionLevel, setAttentionLevel] = createSignal<1 | 2>(1);
   const [assetId, setAssetId] = createSignal("hydrophone-01");
   const [running, setRunning] = createSignal(true);
   const [colormap, setColormap] = createSignal<ColormapName>("viridis");
-  const [spectrumSource, setSpectrumSource] =
-    createSignal<AudioSource>("simulation");
+  const [spectrumSource, setSpectrumSource] = createSignal<AudioSource>("simulation");
   const [popupError, setPopupError] = createSignal("");
+
   const channel = new WindowChannelRegistry(
     "spectrogram_c2_demo",
     window.location.href,
@@ -94,7 +94,7 @@ export default function SpectrogramDashboard() {
   };
 
   const castToL3 = () => {
-    const target = new URL("/pages/spectrogram-detail", window.location.origin);
+    const target = new URL("/pages/l3-spectrogram-workspace", window.location.origin);
     target.searchParams.set("assetId", assetId());
     target.searchParams.set("level", "3");
     if (channel.openChild(target.href)) {
@@ -106,116 +106,72 @@ export default function SpectrogramDashboard() {
 
   return (
     <div class={styles.root}>
-      <header class={styles.header}>
-        <div>
-          <span class="eyebrow">Operational overview dashboard · L1-L2</span>
-          <h1>Acoustic operations</h1>
+      <section
+        class={styles.widget}
+        aria-label="Operational overview dashboard"
+      >
+        <h2>Forward hydrophone array</h2>
+        <div class={styles.actions}>
+          <obc-button
+            variant={attentionLevel() === 2 ? "raised" : "normal"}
+            onClick={() =>
+              setAttentionLevel((level) => (level === 1 ? 2 : 1))
+            }
+          >
+            {attentionLevel() === 1 ? "Inspect at L2" : "Return to L1"}
+          </obc-button>
+          <obc-button variant="raised" onClick={castToL3}>
+            Open L3 workspace
+          </obc-button>
         </div>
-        <span>
-          {channel.peers().length} detailed view
-          {channel.peers().length === 1 ? "" : "s"}
-        </span>
-      </header>
+        <Spectrogram
+          attentionLevel={attentionLevel()}
+          assetId={assetId()}
+          running={running}
+          colormap={colormap}
+          spectrumSource={spectrumSource}
+          onRunningChange={(nextRunning) =>
+            broadcastControls(nextRunning, colormap(), spectrumSource())
+          }
+          onColormapChange={(nextColormap) =>
+            broadcastControls(running(), nextColormap, spectrumSource())
+          }
+          onSpectrumSourceChange={(nextSpectrumSource) =>
+            broadcastControls(running(), colormap(), nextSpectrumSource)
+          }
+        />
 
-      <div class={styles.layout}>
-        <section
-          class={styles.overview}
-          aria-label="Operational overview dashboard"
-        >
-          <div class={styles["widget-list"]}>
-            <section
-              class={[
-                styles.widget,
-                { [styles["attention"]]: attentionLevel() === 2 },
-              ]}
-            >
-              <h2>Forward hydrophone array</h2>
-              <div class={styles.actions}>
-                <obc-button
-                  variant={attentionLevel() === 2 ? "raised" : "normal"}
-                  onClick={() =>
-                    setAttentionLevel((level) => (level === 1 ? 2 : 1))
-                  }
-                >
-                  {attentionLevel() === 1 ? "Inspect at L2" : "Return to L1"}
-                </obc-button>
-                <obc-button variant="raised" onClick={castToL3}>
-                  Open L3 workspace
-                </obc-button>
-              </div>
-              <Spectrogram
-                attentionLevel={attentionLevel()}
-                assetId={assetId()}
-                running={running}
-                colormap={colormap}
-                spectrumSource={spectrumSource}
-                onRunningChange={(nextRunning) =>
-                  broadcastControls(nextRunning, colormap(), spectrumSource())
-                }
-                onColormapChange={(nextColormap) =>
-                  broadcastControls(running(), nextColormap, spectrumSource())
-                }
-                onSpectrumSourceChange={(nextSpectrumSource) =>
-                  broadcastControls(running(), colormap(), nextSpectrumSource)
-                }
-              />
-
-              <Show when={attentionLevel() === 2}>
-                <dl class={styles.summary}>
-                  <div>
-                    <dt>Array state</dt>
-                    <dd>Nominal</dd>
-                  </div>
-                  <div>
-                    <dt>Peak band</dt>
-                    <dd>2.4 kHz</dd>
-                  </div>
-                  <div>
-                    <dt>Signal margin</dt>
-                    <dd>18 dB</dd>
-                  </div>
-                </dl>
-              </Show>
-            </section>
+        <dl class={styles.details}>
+          <div>
+            <dt>Attention model</dt>
+            <dd>L{attentionLevel()} {attentionLevel() === 1 ? "Monitor" : "Inspect"}</dd>
           </div>
-        </section>
-
-        <aside class={styles.context}>
-          <span>Attention model</span>
-          <h2>{attentionLevel() === 1 ? "Monitor" : "Inspect"}</h2>
-          <p>
+          <div class={styles.help}>
             {attentionLevel() === 1
               ? "L1 keeps status and attention cues compact inside the operational overview."
               : "L2 expands the live view and basic controls while preserving dashboard context."}
+          </div>
+          <div>
+            <dt>L3 peers</dt>
+            <dd>{channel.peers().length}</dd>
+          </div>
+        </dl>
+        <Show when={popupError()}>
+          <p class={styles.error} role="alert">
+            {popupError()}
           </p>
-          <dl class={styles.details}>
-            <div>
-              <dt>Asset</dt>
-              <dd>{assetId()}</dd>
-            </div>
-            <div>
-              <dt>Current level</dt>
-              <dd>L{attentionLevel()}</dd>
-            </div>
-            <div>
-              <dt>L3 peers</dt>
-              <dd>{channel.peers().length}</dd>
-            </div>
-          </dl>
-          <Show when={popupError()}>
+        </Show>
+        <Show when={channel.error()}>
+          {(error) => (
             <p class={styles.error} role="alert">
-              {popupError()}
+              {error()}
             </p>
-          </Show>
-          <Show when={channel.error()}>
-            {(error) => (
-              <p class={styles.error} role="alert">
-                {error()}
-              </p>
-            )}
-          </Show>
-        </aside>
-      </div>
+          )}
+        </Show>
+
+
+
+      </section>
     </div>
   );
 }
