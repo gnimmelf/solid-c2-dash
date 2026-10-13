@@ -53,15 +53,15 @@ declare module "virtual:file-routes" {
       $$route?: undefined;
     },
     {
-      path: "/pages/l3-spectrogram-workspace";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l3-spectrogram-workspace")>;
-      $$route?: undefined;
-    },
-    {
       path: "/pages/l1-l2-spectrogram-dashboard";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/pages/l1-l2-spectrogram-dashboard")>;
+      $$route?: undefined;
+    },
+    {
+      path: "/pages/l3-spectrogram-workspace";
+      page: true;
+      $component: FileRouteLazyRef<typeof import("./src/routes/pages/l3-spectrogram-workspace")>;
       $$route?: undefined;
     },
     {

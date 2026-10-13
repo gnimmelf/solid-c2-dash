@@ -1,3 +1,5 @@
+allowBuilds:
+  '@vaadin/vaadin-usage-statistics': true
 # pnpm settings for this project (honored even for a single-package project —
 # this file marks the workspace root). The Solid packages release in lockstep
 # and templates track them closely; exclude the whole family from any
