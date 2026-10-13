@@ -18,18 +18,18 @@ type Detection = {
 };
 
 const detections: Detection[] = [
-  { coordinates: [10.4852, 59.4294], intensity: 0.92 },
-  { coordinates: [10.4864, 59.4299], intensity: 0.76 },
-  { coordinates: [10.4843, 59.4288], intensity: 0.63 },
-  { coordinates: [10.4871, 59.4290], intensity: 0.88 },
-  { coordinates: [10.4858, 59.4282], intensity: 0.55 },
-  { coordinates: [10.4839, 59.4297], intensity: 0.7 },
-  { coordinates: [10.4880, 59.4304], intensity: 0.46 },
-  { coordinates: [10.4848, 59.4306], intensity: 0.58 },
-  { coordinates: [10.4868, 59.4284], intensity: 0.84 },
-  { coordinates: [10.4829, 59.4292], intensity: 0.67 },
-  { coordinates: [10.4877, 59.4280], intensity: 0.51 },
-  { coordinates: [10.4835, 59.4303], intensity: 0.79 },
+  { coordinates: [10.499587, 59.429763], intensity: 1.0 },
+  { coordinates: [10.503477, 59.430613], intensity: 0.81 },
+  { coordinates: [10.498948, 59.428223], intensity: 0.66 },
+  { coordinates: [10.504738, 59.428661], intensity: 0.95 },
+  { coordinates: [10.502014, 59.427308], intensity: 0.56 },
+  { coordinates: [10.498293, 59.430070], intensity: 0.0 },
+  { coordinates: [10.505344, 59.430985], intensity: 0.46 },
+  { coordinates: [10.500307, 59.431462], intensity: 0.6 },
+  { coordinates: [10.503812, 59.427663], intensity: 0.91 },
+  { coordinates: [10.497144, 59.429117], intensity: 0.71 },
+  { coordinates: [10.504832, 59.427309], intensity: 0.52 },
+  { coordinates: [10.498217, 59.430916], intensity: 0.85 },
 ];
 
 export default function MapView() {
@@ -68,8 +68,8 @@ export default function MapView() {
     const initialMapInstance = new MapLibreMap({
       container: mapElement,
       style: themedProps().mapStyle,
-      center: [10.4851, 59.41565],
-      zoom: 11,
+      center: [10.49, 59.425],
+      zoom: 14,
       pitch: 42,
       bearing: -18,
       attributionControl: false,
