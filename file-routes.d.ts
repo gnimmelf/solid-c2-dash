@@ -59,12 +59,6 @@ declare module "virtual:file-routes" {
       $$route?: undefined;
     },
     {
-      path: "/pages/oicl-control-surface";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/oicl-control-surface")>;
-      $$route?: undefined;
-    },
-    {
       path: "/pages/spectrogram-dashboard";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-dashboard")>;
@@ -74,12 +68,6 @@ declare module "virtual:file-routes" {
       path: "/pages/spectrogram-detail";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-detail")>;
-      $$route?: undefined;
-    },
-    {
-      path: "/pages/spectrogram";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram")>;
       $$route?: undefined;
     }
   ];
@@ -120,26 +108,10 @@ declare module "virtual:file-routes" {
       children?: undefined;
     },
     {
-      path: "/pages/spectrogram";
-      id: "/pages/spectrogram";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram")>;
-      $$route?: undefined;
-      children?: undefined;
-    },
-    {
       path: "/pages/spectrogram-detail";
       id: "/pages/spectrogram-detail";
       page: true;
       $component: FileRouteLazyRef<typeof import("./src/routes/pages/spectrogram-detail")>;
-      $$route?: undefined;
-      children?: undefined;
-    },
-    {
-      path: "/pages/oicl-control-surface";
-      id: "/pages/oicl-control-surface";
-      page: true;
-      $component: FileRouteLazyRef<typeof import("./src/routes/pages/oicl-control-surface")>;
       $$route?: undefined;
       children?: undefined;
     },

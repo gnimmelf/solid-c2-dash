@@ -1,8 +1,0 @@
-[
-  {
-    "tag": "oicl-control-surface",
-    "source": "../components/oicl-control-surface/index.tsx",
-    "props": ["title"],
-    "events": ["button-click"]
-  }
-]

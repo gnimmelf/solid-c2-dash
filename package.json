@@ -6,21 +6,9 @@
   "files": [
     "dist"
   ],
-  "exports": {
-    "./custom-elements": {
-      "types": "./dist/custom-elements/index.d.ts",
-      "import": "./dist/custom-elements/index.js"
-    },
-    "./custom-elements/*": {
-      "types": "./dist/custom-elements/*.d.ts",
-      "import": "./dist/custom-elements/*.js"
-    }
-  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:exports": "vite build --config vite.custom-elements.config.ts",
-    "serve:exports": "pnpx static-server dist -o -i docs/index.html",
     "serve": "vite preview",
     "test": "vitest",
     "lint": "oxlint src"
