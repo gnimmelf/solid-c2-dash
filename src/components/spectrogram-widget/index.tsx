@@ -12,9 +12,11 @@ import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
 import styles from "./style.module.css";
 import { AudioSource } from "../spectrogram/spectrum-source";
 
-export default function SpectrogramWidget() {
+export default function SpectrogramWidget(props: { widgetId: string }) {
   const [attentionLevel, setAttentionLevel] = createSignal<1 | 2>(1);
-  const [assetId, setAssetId] = createSignal("hydrophone-01");
+  const [assetId, setAssetId] = createSignal(
+    `hydrophone-${props.widgetId.padStart(2, "0")}`,
+  );
   const [running, setRunning] = createSignal(true);
   const [colormap, setColormap] = createSignal<ColormapName>("viridis");
   const [spectrumSource, setSpectrumSource] = createSignal<AudioSource>("simulation");
@@ -94,7 +96,7 @@ export default function SpectrogramWidget() {
         class={styles.widget}
         aria-label="Operational overview dashboard"
       >
-        <h2>Forward hydrophone array</h2>
+        <h2>Hydrophone array #{props.widgetId}</h2>
         <div class={styles.actions}>
           <obc-button
             variant={attentionLevel() === 2 ? "raised" : "normal"}

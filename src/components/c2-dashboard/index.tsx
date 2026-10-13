@@ -19,8 +19,8 @@ export default function C2Dashboard() {
         aria-label="Operational overview dashboard"
       >
         <div class={styles["widget-list"]}>
-          <SpectrogramWidget />
-          <SpectrogramWidget />
+          <SpectrogramWidget widgetId="1" />
+          <SpectrogramWidget widgetId="2" />
         </div>
       </section>
     </div>
