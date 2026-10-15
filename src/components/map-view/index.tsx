@@ -1,23 +1,8 @@
-import {
-  createEffect,
-  createMemo,
-  createSignal,
-  onCleanup,
-  untrack,
-} from "solid-js";
-import { MapLibreOverlay } from "@deck.gl/maplibre";
+import { createMemo, createSignal } from "solid-js";
 import { ScatterplotLayer } from "@deck.gl/layers";
 import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
-import {
-  AttributionControl,
-  Map as MapLibreMap,
-  NavigationControl,
-  setWorkerUrl,
-} from "maplibre-gl";
-import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
-import "maplibre-gl/dist/maplibre-gl.css";
 import styles from "./style.module.css";
-import { getTheme, THEME_CHANGE_EVENT } from "../../lib/theme";
+import MapEngine from "./map-engine";
 
 type Detection = {
   coordinates: [number, number];
@@ -69,139 +54,21 @@ function createDemoLayer(visible = true) {
 }
 
 export default function MapView() {
-  const [localTheme, setLocalTheme] = createSignal(getTheme());
-
-  const [mapElement, setMapElement] = createSignal<HTMLDivElement | undefined>();
-  const [mapInstance, setMapInstance]  = createSignal<MapLibreMap | undefined>();
-  const [mapOverlay, setMapOverlay]  = createSignal<MapLibreOverlay | undefined>();
   const [isDemoLayerShown, setIsDemoLayerShown] = createSignal(true);
-
-
-  const handleThemeChange = () => setLocalTheme(getTheme());
-  window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
-  onCleanup(() =>
-    window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange),
-  );
-
-  const themedProps = createMemo(() => {
-    const theme = localTheme();
-    return {
-      mapStyle:
-        theme === "day" || theme === "bright"
-          ? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-          : "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-    };
-  });
-
-  createEffect(
-    () => mapElement(),
-    (mapElement) => {
-      if (mapElement) {
-        setWorkerUrl(mapLibreWorkerUrl);
-        const map = initiateMapLibre(mapElement, untrack(themedProps));
-
-        return () => {
-          setMapInstance(undefined);
-          map.remove();
-        };
-      }
-    },
-  );
-
-  createEffect(
-    () => mapInstance(),
-    (mapInstance) => {
-      if (!mapInstance) return;
-
-      let disposeDeckGl: (() => void) | undefined;
-      const handleLoad = () => {
-        disposeDeckGl = initiateDeckGl(mapInstance);
-      };
-
-      if (mapInstance.loaded()) handleLoad();
-      else mapInstance.once("load", handleLoad);
-
-      return () => {
-        mapInstance.off("load", handleLoad);
-        disposeDeckGl?.();
-      };
-    },
-  );
-
-  createEffect(
-    () => [mapInstance(), themedProps().mapStyle] as const,
-    ([mapInstance, mapStyle]) => {
-      mapInstance?.setStyle(mapStyle);
-    },
-  );
-
-  function initiateMapLibre(
-    mapElement: HTMLDivElement,
-    initialTheme: ReturnType<typeof themedProps>,
-  ) {
-    const initialLibreMapInstance = new MapLibreMap({
-      container: mapElement,
-      style: initialTheme.mapStyle,
-      center: [10.49, 59.425],
-      zoom: 14,
-      pitch: 42,
-      bearing: -18,
-      attributionControl: false,
-    });
-    setMapInstance(initialLibreMapInstance);
-    return initialLibreMapInstance;
-  }
-
-  function initiateDeckGl(mapInstance: MapLibreMap) {
-    /* MapLibreOverlay is effectively the MapLibre-aware owner/facade for the internal Deck instance. 
-    Use it instead of constructing Deck directly when MapLibre is the base map. */
-    const overlay = new MapLibreOverlay({
-      interleaved: true,
-      layers: [createDemoLayer()],
-    });
-
-    mapInstance.addControl(overlay);
-    const navigationControl = new NavigationControl({ showCompass: true });
-    const attributionControl = new AttributionControl({ compact: true });
-    mapInstance.addControl(navigationControl, "top-right");
-    mapInstance.addControl(attributionControl);
-
-    setMapOverlay(overlay);
-
-    return () => {
-      setMapOverlay(undefined);
-      if (mapInstance.hasControl(overlay)) mapInstance.removeControl(overlay);
-      if (mapInstance.hasControl(navigationControl)) {
-        mapInstance.removeControl(navigationControl);
-      }
-      if (mapInstance.hasControl(attributionControl)) {
-        mapInstance.removeControl(attributionControl);
-      }
-    };
-  }
+  const layers = createMemo(() => [createDemoLayer(isDemoLayerShown())]);
 
   function toggleDemoLayer() {
-    const overlay = mapOverlay();
-    if (!overlay) return;
-
-    const isShown = !isDemoLayerShown();
-    overlay.setProps({ layers: [createDemoLayer(isShown)] });
-    setIsDemoLayerShown(isShown);
+    setIsDemoLayerShown((isShown) => !isShown);
   }
 
   return (
     <section class={styles.mapView}>
-      <aside  class={styles['layers-cataloge']}>
+      <aside class={styles["layers-cataloge"]}>
         <obc-button onClick={toggleDemoLayer}>Toggle Demo Layer</obc-button>
       </aside>
 
       <div class={styles.mapFrame}>
-        <div
-          class={styles.map}
-          ref={(element) => {
-            setMapElement(element);
-          }}
-        />
+        <MapEngine layers={layers()} />
       </div>
     </section>
   );
