@@ -20,12 +20,12 @@
 
 Build a lightweight Kepler-style map workspace composed of independent features:
 
-- Map engine
-- Layer catalog
-- Dataset repository
-- Layer compiler
-- Catalog UI
-- DuckDB query engine (future)
+- [x] Map engine
+- [x] Layer catalog
+- [ ] Dataset repository
+- [ ] Layer compiler
+- [ ] Catalog UI
+- [ ] DuckDB query engine (future)
 
 A parent workspace owns and composes these features. The map engine renders layers but does not own catalog business logic.
 
@@ -224,24 +224,24 @@ Execute these phases in order. Keep each phase independently testable.
 ### Phase 2: Add Typed Catalog State
 
 1. Define `BaseLayerDefinition` and one initial `ScatterplotLayerDefinition`.
-2. Create catalog state with explicit `addLayer`, `removeLayer`, `toggleVisibility`, `moveLayer`, and typed update commands.
+2. Create catalog state with explicit `addLayer`, `removeLayer`, `toggleVisibility`, `moveLayer`, and selection commands.
 3. Move the hardcoded demo configuration into catalog initial state.
 4. Test ordering, visibility, deletion, and stable IDs without rendering a map.
 
-### Phase 3: Add the Layer Compiler
-
-1. Compile the scatterplot definition into `ScatterplotLayer`.
-2. Retain hidden layers with `visible: false`.
-3. Feed the complete compiled array to the map engine.
-4. Test type mapping, ordering, accessors, visibility, and unchanged IDs.
-
-### Phase 4: Add the Dataset Repository
+### Phase 3: Add the Dataset Repository
 
 1. Define source descriptors separately from parsed data.
 2. Load CSV as object rows through `CSVLoader`, with status, error, and cancellation state.
-3. Resolve `datasetId` in the compiler.
-4. Keep the compiler dispatching on `DatasetData.kind`, but implement only `"rows"` initially.
+3. Define the dataset lookup contract consumed by the future compiler.
+4. Seed the existing demo rows through the repository rather than catalog state.
 5. Test success, malformed input, cancellation, deletion, and shared datasets.
+
+### Phase 4: Add the Layer Compiler
+
+1. Compile the scatterplot definition and resolved `datasetId` into `ScatterplotLayer`.
+2. Keep the compiler dispatching on `DatasetData.kind`, but implement only `"rows"` initially.
+3. Retain hidden layers with `visible: false` and feed the complete array to the map engine.
+4. Test type mapping, ordering, accessors, visibility, and unchanged IDs.
 
 ### Phase 5: Build the Catalog UI
 
