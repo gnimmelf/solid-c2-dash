@@ -29,8 +29,11 @@
     "vitest": "^5.0.0"
   },
   "dependencies": {
+    "@deck.gl/core": "^9.4.0",
     "@deck.gl/layers": "^9.4.0",
     "@deck.gl/mapbox": "^9.4.0",
+    "@deck.gl/maplibre": "^9.4.0",
+    "@loaders.gl/csv": "^4.5.4",
     "@oicl/openbridge-webcomponents": "^2.0.0-next.174",
     "@solidjs/meta": "^1.0.0-next.2",
     "@solidjs/router": "^2.0.0-next.21",

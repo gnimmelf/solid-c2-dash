@@ -4,7 +4,10 @@
 	height: 100%;
 	flex-direction: column;
 	overflow: hidden;
+	position: relative;
 }
+
+/* Map */
 
 .mapFrame {
 	position: relative;
@@ -47,4 +50,25 @@
 :global(:root[data-obc-theme="night"]) .map :global(.maplibregl-ctrl-icon) {
   /* Match `--on-flat-active-color` - Thanks, AI */
 	filter: invert(69%) sepia(37%) saturate(618%) hue-rotate(343deg) brightness(97%) contrast(88%);
+}
+
+/* Controls */
+
+aside.layers-cataloge {
+	position: absolute;
+	top: 0px;
+	left: 0px;
+	z-index: 9999;
+	margin: var(--default-gap);
+
+	min-width: 200px;
+
+	display: flex;
+	flex-direction: column;
+	gap: var(--default-gap);
+
+	padding: var(--ui-components-card-padding);
+	background-color: var(--container-background-color);
+	border: 1px solid var(--border-outline-color);
+	border-radius: var(--ui-components-card-border-radius-regular);
 }
