@@ -22,7 +22,7 @@ Build a lightweight Kepler-style map workspace composed of independent features:
 
 - [x] Map engine
 - [x] Layer catalog
-- [ ] Dataset repository
+- [x] Dataset repository
 - [ ] Layer compiler
 - [ ] Catalog UI
 - [ ] DuckDB query engine (future)
@@ -103,6 +103,8 @@ Owns non-serializable and potentially large data state:
 - Cache identity and disposal
 
 Use `@loaders.gl/csv` for CSV parsing. If using the loaders.gl `load()` API directly, add `@loaders.gl/core` as a direct dependency. A deck.gl layer may alternatively load a URL using `data: url` and `loaders: [CSVLoader]`; use the repository when the UI, multiple layers, or DuckDB need shared access to the data.
+
+The initial repository separates acquisition from format parsing. URL and browser `File` sources both produce an `ArrayBuffer` that passes through the same `CSVLoader.parse()` path; embedded rows bypass parsing. Persisted file descriptors contain metadata only. Browser `File` objects remain runtime-owned and must be reattached by the user after restoring a workspace.
 
 The initial implementation uses object rows because they are easy to validate, inspect, query, and map with deck.gl accessors. Keep the repository and compiler contracts independent of that representation so a measured hot path can later use streamed Arrow batches or external binary attributes without changing catalog state or UI code.
 

@@ -1,6 +1,10 @@
-import { createMemo } from "solid-js";
+import { createMemo, onCleanup } from "solid-js";
 import { ScatterplotLayer } from "@deck.gl/layers";
 import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
+import {
+  createDatasetRepository,
+  type DatasetRow,
+} from "./dataset-repository";
 import {
   createLayerCatalog,
   type CatalogState,
@@ -9,13 +13,7 @@ import {
 import styles from "./style.module.css";
 import MapEngine from "./map-engine";
 
-type Detection = Record<string, number> & {
-  longitude: number;
-  latitude: number;
-  intensity: number;
-};
-
-const detections: Detection[] = [
+const detections: DatasetRow[] = [
   { longitude: 10.499587, latitude: 59.429763, intensity: 1.0 },
   { longitude: 10.503477, latitude: 59.430613, intensity: 0.81 },
   { longitude: 10.498948, latitude: 59.428223, intensity: 0.66 },
@@ -49,21 +47,30 @@ const initialCatalogState: CatalogState = {
   ],
 };
 
-function createDemoLayer(definition: ScatterplotLayerDefinition) {
+function numericColumn(row: DatasetRow, column: string) {
+  const value = row[column];
+  return typeof value === "number" ? value : 0;
+}
+
+function createDemoLayer(
+  definition: ScatterplotLayerDefinition,
+  rows: readonly DatasetRow[],
+) {
   const [red, green, blue, alpha] = definition.fillColor;
-  return new ScatterplotLayer<Detection>({
+  return new ScatterplotLayer<DatasetRow>({
     id: definition.id,
     visible: definition.visible,
     opacity: definition.opacity,
-    data: detections,
-    getPosition: (detection) => [
-      detection[definition.position.longitudeColumn],
-      detection[definition.position.latitudeColumn],
+    data: rows,
+    getPosition: (row) => [
+      numericColumn(row, definition.position.longitudeColumn),
+      numericColumn(row, definition.position.latitudeColumn),
     ],
-    getRadius: (detection) => definition.radius + detection.intensity * 180,
-    getFillColor: (detection) => [
+    getRadius: (row) =>
+      definition.radius + numericColumn(row, "intensity") * 180,
+    getFillColor: (row) => [
       red,
-      Math.round(green + detection.intensity * 108),
+      Math.round(green + numericColumn(row, "intensity") * 108),
       blue,
       alpha,
     ],
@@ -78,7 +85,18 @@ function createDemoLayer(definition: ScatterplotLayerDefinition) {
 
 export default function MapView() {
   const [catalog, catalogActions] = createLayerCatalog(initialCatalogState);
-  const layers = createMemo(() => catalog.layers.map(createDemoLayer));
+  const [repository, datasetActions] = createDatasetRepository([
+    { id: "demo-detections", rows: detections },
+  ]);
+  onCleanup(datasetActions.dispose);
+
+  const layers = createMemo(() =>
+    catalog.layers.map((definition) => {
+      const dataset = repository.datasets[definition.datasetId];
+      const rows = dataset?.status === "ready" ? dataset.data?.rows ?? [] : [];
+      return createDemoLayer(definition, rows);
+    }),
+  );
 
   function toggleDemoLayer() {
     catalogActions.toggleVisibility("detection-points");
