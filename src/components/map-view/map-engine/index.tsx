@@ -12,6 +12,7 @@ import {
   Map as MapLibreMap,
   NavigationControl,
   setWorkerUrl,
+  type StyleSpecification,
 } from "maplibre-gl";
 import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -22,11 +23,30 @@ type MapEngineProps = {
   layers: readonly Layer[];
 };
 
+const LIGHT_MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json";
+const DARK_MAP_STYLE =
+  "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+
+async function loadMapStyle(url: string): Promise<StyleSpecification | string> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return url;
+    return (await response.json()) as StyleSpecification;
+  } catch {
+    return url;
+  }
+}
+
 export default function MapEngine(props: MapEngineProps) {
   const [localTheme, setLocalTheme] = createSignal(getTheme());
   const [mapElement, setMapElement] = createSignal<HTMLDivElement>();
   const [mapInstance, setMapInstance] = createSignal<MapLibreMap>();
   const [mapOverlay, setMapOverlay] = createSignal<MapLibreOverlay>();
+  const preloadedStyles = new Map([
+    [LIGHT_MAP_STYLE, loadMapStyle(LIGHT_MAP_STYLE)],
+    [DARK_MAP_STYLE, loadMapStyle(DARK_MAP_STYLE)],
+  ]);
 
   const handleThemeChange = () => setLocalTheme(getTheme());
   window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
@@ -37,8 +57,8 @@ export default function MapEngine(props: MapEngineProps) {
   const mapStyle = createMemo(() => {
     const theme = localTheme();
     return theme === "day" || theme === "bright"
-      ? "https://basemaps.cartocdn.com/gl/positron-gl-style/style.json"
-      : "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+      ? LIGHT_MAP_STYLE
+      : DARK_MAP_STYLE;
   });
 
   createEffect(
@@ -55,6 +75,7 @@ export default function MapEngine(props: MapEngineProps) {
         pitch: 42,
         bearing: -18,
         attributionControl: false,
+        fadeDuration: 0,
       });
       setMapInstance(map);
 
@@ -109,7 +130,24 @@ export default function MapEngine(props: MapEngineProps) {
   createEffect(
     () => [mapInstance(), mapStyle()] as const,
     ([map, style]) => {
-      map?.setStyle(style);
+      if (!map) return;
+
+      let cancelled = false;
+      void preloadedStyles.get(style)?.then((preloadedStyle) => {
+        if (cancelled) return;
+        map.setStyle(preloadedStyle, {
+          transformStyle: (previousStyle, nextStyle) => {
+            return {
+              ...nextStyle,
+              transition: { duration: 0, delay: 0 },
+            };
+          },
+        });
+      });
+
+      return () => {
+        cancelled = true;
+      };
     },
   );
 
