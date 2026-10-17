@@ -1,15 +1,11 @@
 import { createMemo, onCleanup } from "solid-js";
-import { ScatterplotLayer } from "@deck.gl/layers";
 import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
 import {
   createDatasetRepository,
   type DatasetRow,
 } from "./dataset-repository";
-import {
-  createLayerCatalog,
-  type CatalogState,
-  type ScatterplotLayerDefinition,
-} from "./layer-catalog";
+import { createLayerCatalog, type CatalogState } from "./layer-catalog";
+import { compileLayers } from "./layer-compiler";
 import styles from "./style.module.css";
 import MapEngine from "./map-engine";
 
@@ -41,47 +37,14 @@ const initialCatalogState: CatalogState = {
         longitudeColumn: "longitude",
         latitudeColumn: "latitude",
       },
-      radius: 90,
+      radius: {
+        base: 90,
+        byColumn: { column: "intensity", scale: 180 },
+      },
       fillColor: [242, 102, 67, 190],
     },
   ],
 };
-
-function numericColumn(row: DatasetRow, column: string) {
-  const value = row[column];
-  return typeof value === "number" ? value : 0;
-}
-
-function createDemoLayer(
-  definition: ScatterplotLayerDefinition,
-  rows: readonly DatasetRow[],
-) {
-  const [red, green, blue, alpha] = definition.fillColor;
-  return new ScatterplotLayer<DatasetRow>({
-    id: definition.id,
-    visible: definition.visible,
-    opacity: definition.opacity,
-    data: rows,
-    getPosition: (row) => [
-      numericColumn(row, definition.position.longitudeColumn),
-      numericColumn(row, definition.position.latitudeColumn),
-    ],
-    getRadius: (row) =>
-      definition.radius + numericColumn(row, "intensity") * 180,
-    getFillColor: (row) => [
-      red,
-      Math.round(green + numericColumn(row, "intensity") * 108),
-      blue,
-      alpha,
-    ],
-    getLineColor: [255, 255, 255, 220],
-    getLineWidth: 1.5,
-    lineWidthMinPixels: 1,
-    radiusMinPixels: 5,
-    radiusMaxPixels: 22,
-    pickable: true,
-  });
-}
 
 export default function MapView() {
   const [catalog, catalogActions] = createLayerCatalog(initialCatalogState);
@@ -91,11 +54,7 @@ export default function MapView() {
   onCleanup(datasetActions.dispose);
 
   const layers = createMemo(() =>
-    catalog.layers.map((definition) => {
-      const dataset = repository.datasets[definition.datasetId];
-      const rows = dataset?.status === "ready" ? dataset.data?.rows ?? [] : [];
-      return createDemoLayer(definition, rows);
-    }),
+    compileLayers(catalog.layers, repository.datasets),
   );
 
   function toggleDemoLayer() {

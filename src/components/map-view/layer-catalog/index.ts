@@ -14,7 +14,13 @@ export type ScatterplotLayerDefinition = BaseLayerDefinition & {
     longitudeColumn: string;
     latitudeColumn: string;
   };
-  radius: number;
+  radius: {
+    base: number;
+    byColumn?: {
+      column: string;
+      scale: number;
+    };
+  };
   fillColor: readonly [number, number, number, number];
 };
 

@@ -21,7 +21,7 @@ function layer(
       longitudeColumn: "longitude",
       latitudeColumn: "latitude",
     },
-    radius: 100,
+    radius: { base: 100 },
     fillColor: [242, 210, 67, 190],
     ...overrides,
   };

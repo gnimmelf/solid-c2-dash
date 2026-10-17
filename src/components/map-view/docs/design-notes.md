@@ -23,7 +23,7 @@ Build a lightweight Kepler-style map workspace composed of independent features:
 - [x] Map engine
 - [x] Layer catalog
 - [x] Dataset repository
-- [ ] Layer compiler
+- [x] Layer compiler
 - [ ] Catalog UI
 - [ ] DuckDB query engine (future)
 
@@ -123,6 +123,10 @@ function compileLayers(
 
 Use typed constructors and stable IDs. Creating new layer descriptions is expected; deck.gl reuses the prior layer's internal GPU state when type and ID match.
 
+The initial scatterplot compiler supports a constant fill color and a radius
+defined by a base value with optional column modulation. Missing, idle, loading,
+and failed datasets retain their layer identity with empty row data.
+
 ## State Models
 
 Use discriminated unions instead of `[key: string]: any`.
@@ -144,7 +148,10 @@ type BaseLayerDefinition = {
 type ScatterplotLayerDefinition = BaseLayerDefinition & {
   type: "scatterplot";
   position: { longitudeColumn: string; latitudeColumn: string };
-  radius: number;
+  radius: {
+    base: number;
+    byColumn?: { column: string; scale: number };
+  };
   fillColor: readonly [number, number, number, number];
 };
 
@@ -240,10 +247,10 @@ Execute these phases in order. Keep each phase independently testable.
 
 ### Phase 4: Add the Layer Compiler
 
-1. Compile the scatterplot definition and resolved `datasetId` into `ScatterplotLayer`.
-2. Keep the compiler dispatching on `DatasetData.kind`, but implement only `"rows"` initially.
-3. Retain hidden layers with `visible: false` and feed the complete array to the map engine.
-4. Test type mapping, ordering, accessors, visibility, and unchanged IDs.
+1. [x] Compile the scatterplot definition and resolved `datasetId` into `ScatterplotLayer`.
+2. [x] Keep the compiler dispatching on `DatasetData.kind`, but implement only `"rows"` initially.
+3. [x] Retain hidden layers with `visible: false` and feed the complete array to the map engine.
+4. [x] Test type mapping, ordering, accessors, visibility, and unchanged IDs.
 
 ### Phase 5: Build the Catalog UI
 
