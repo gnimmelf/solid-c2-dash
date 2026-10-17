@@ -9,23 +9,37 @@
 import type { JSX as SolidJSX } from '@solidjs/web';
 import type { ObcCard } from '@oicl/openbridge-webcomponents/dist/components/card/card.js';
 import type { ObcButton } from '@oicl/openbridge-webcomponents/dist/components/button/button.js';
+import type { ObcCheckbox } from '@oicl/openbridge-webcomponents/dist/components/checkbox/checkbox.js';
 import type { ObcDropdownButton } from '@oicl/openbridge-webcomponents/dist/components/dropdown-button/dropdown-button.js';
+import type { ObcIconCheckButton } from '@oicl/openbridge-webcomponents/dist/components/icon-check-button/icon-check-button.js';
 import type { ObcIconButton } from '@oicl/openbridge-webcomponents/dist/components/icon-button/icon-button.js';
 import type { ObcToggleButtonGroup } from '@oicl/openbridge-webcomponents/dist/components/toggle-button-group/toggle-button-group.js';
 import type { ObcToggleButtonOption } from '@oicl/openbridge-webcomponents/dist/components/toggle-button-option/toggle-button-option.js';
 import type { ObcStartStopSwitch } from '@oicl/openbridge-webcomponents/dist/components/start-stop-switch/start-stop-switch.js';
+import type { ObiChevronDownGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-chevron-down-google.js';
+import type { ObiChevronUpGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-chevron-up-google.js';
+import type { ObiDelete } from '@oicl/openbridge-webcomponents/dist/icons/icon-delete.js';
 import type { ObiPaletteDimming } from '@oicl/openbridge-webcomponents/dist/icons/icon-palette-dimming.js';
+import type { ObiVisibilityOffGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-visibility-off-google.js';
+import type { ObiVisibilityOnGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-visibility-on-google.js';
 
 /** Register every OICL custom element used in .tsx files here. */
 interface OiclComponents {
   'obc-card': ObcCard;
   'obc-button': ObcButton;
+  'obc-checkbox': ObcCheckbox;
   'obc-dropdown-button': ObcDropdownButton;
+  'obc-icon-check-button': ObcIconCheckButton;
   'obc-icon-button': ObcIconButton;
   'obc-toggle-button-group': ObcToggleButtonGroup;
   'obc-toggle-button-option': ObcToggleButtonOption;
   'obc-start-stop-switch': ObcStartStopSwitch;
+  'obi-chevron-down-google': ObiChevronDownGoogle;
+  'obi-chevron-up-google': ObiChevronUpGoogle;
+  'obi-delete': ObiDelete;
   'obi-palette-dimming': ObiPaletteDimming;
+  'obi-visibility-off-google': ObiVisibilityOffGoogle;
+  'obi-visibility-on-google': ObiVisibilityOnGoogle;
 }
 
 /** Boolean/string Lit properties can also be set as plain lowercase HTML attributes. */

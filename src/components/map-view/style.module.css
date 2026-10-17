@@ -18,18 +18,20 @@
 
 /* Controls */
 
-aside.layers-cataloge {
+aside.layerCatalog {
 	position: absolute;
-	top: 0px;
-	left: 0px;
+	top: 0;
+	left: 0;
 	z-index: 9999;
 	margin: var(--default-gap);
 
-	min-width: 200px;
+	width: min(28rem, calc(100% - 2 * var(--default-gap)));
+	max-height: calc(100% - 2 * var(--default-gap));
 
 	display: flex;
 	flex-direction: column;
 	gap: var(--default-gap);
+	overflow: hidden;
 
 	padding: var(--ui-components-card-padding);
 	background-color: var(--container-background-color);

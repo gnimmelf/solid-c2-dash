@@ -1,10 +1,10 @@
 import { createMemo, onCleanup } from "solid-js";
-import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
 import {
   createDatasetRepository,
   type DatasetRow,
 } from "./dataset-repository";
 import { createLayerCatalog, type CatalogState } from "./layer-catalog";
+import LayerCatalogPanel from "./layer-catalog-panel";
 import { compileLayers } from "./layer-compiler";
 import styles from "./style.module.css";
 import MapEngine from "./map-engine";
@@ -57,14 +57,10 @@ export default function MapView() {
     compileLayers(catalog.layers, repository.datasets),
   );
 
-  function toggleDemoLayer() {
-    catalogActions.toggleVisibility("detection-points");
-  }
-
   return (
     <section class={styles.mapView}>
-      <aside class={styles["layers-cataloge"]}>
-        <obc-button onClick={toggleDemoLayer}>Toggle Demo Layer</obc-button>
+      <aside class={styles.layerCatalog}>
+        <LayerCatalogPanel catalog={catalog} actions={catalogActions} />
       </aside>
 
       <div class={styles.mapFrame}>

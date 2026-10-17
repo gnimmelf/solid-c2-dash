@@ -254,10 +254,15 @@ Execute these phases in order. Keep each phase independently testable.
 
 ### Phase 5: Build the Catalog UI
 
-1. Render layer rows from catalog state.
-2. Add visibility, selection, delete, and ordering controls.
-3. Render a small typed control set for the selected layer.
-4. Keep UI components free of MapLibre and overlay calls; they invoke catalog commands only.
+1. [x] Render layer rows from catalog state.
+2. [x] Add visibility, selection, delete, and ordering controls.
+3. [ ] Render a small typed control set for the selected layer.
+4. [x] Keep UI components free of MapLibre and overlay calls; they invoke catalog commands only.
+
+The initial list uses the installed OpenBridge checkbox and icon-button
+components. Reordering uses explicit up/down actions, and deletion is immediate.
+Layer-specific property controls remain deferred until the list interaction is
+accepted.
 
 ### Phase 6: Persistence
 
