@@ -2,12 +2,12 @@ import { createMemo, onCleanup } from "solid-js";
 import {
   createDatasetRepository,
   type DatasetRow,
-} from "./dataset-repository";
-import { createLayerCatalog, type CatalogState } from "./layer-catalog";
-import LayerCatalogPanel from "./layer-catalog-panel";
-import { compileLayers } from "./layer-compiler";
+} from "./lib/dataset-repository";
+import { createLayerCatalog, type CatalogState } from "./lib/layer-catalog";
+import LayerCatalogPanel from "./components/layer-catalog-panel";
+import { compileLayers } from "./lib/layer-compiler";
 import styles from "./style.module.css";
-import MapEngine from "./map-engine";
+import MapEngine from "./components/map-engine";
 
 const detections: DatasetRow[] = [
   { longitude: 10.499587, latitude: 59.429763, intensity: 1.0 },

@@ -11,7 +11,7 @@ import type {
   CatalogState,
   LayerCatalogActions,
   LayerDefinition,
-} from "../layer-catalog";
+} from "../lib/layer-catalog";
 import styles from "./style.module.css";
 
 type LayerCatalogPanelProps = {

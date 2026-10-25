@@ -3,7 +3,7 @@ import {
   type ScatterplotLayerProps,
 } from "@deck.gl/layers";
 import { describe, expect, it } from "vitest";
-import type { DatasetLookup, DatasetRow } from "../dataset-repository";
+import type { DatasetLookup, DatasetRow } from "../lib/dataset-repository";
 import type { ScatterplotLayerDefinition } from "../layer-catalog";
 import { compileLayers } from ".";
 

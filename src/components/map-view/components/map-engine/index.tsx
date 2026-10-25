@@ -16,7 +16,7 @@ import {
 } from "maplibre-gl";
 import mapLibreWorkerUrl from "maplibre-gl/dist/maplibre-gl-worker.mjs?url";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { getTheme, THEME_CHANGE_EVENT } from "../../../lib/theme";
+import { getTheme, THEME_CHANGE_EVENT } from "../../../../lib/theme";
 import styles from "./style.module.css";
 
 type MapEngineProps = {

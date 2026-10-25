@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   createLayerCatalog,
   type ScatterplotLayerDefinition,
-} from "../layer-catalog";
+} from "../lib/layer-catalog";
 import LayerCatalogPanel from ".";
 
 function layer(id: string): ScatterplotLayerDefinition {
