@@ -1,35 +1,16 @@
 import { createStore, untrack, type Store } from "solid-js";
-
-export type BaseLayerDefinition = {
-  id: string;
-  name: string;
-  datasetId: string;
-  visible: boolean;
-  opacity: number;
-};
-
-export type ScatterplotLayerDefinition = BaseLayerDefinition & {
-  type: "scatterplot";
-  position: {
-    longitudeColumn: string;
-    latitudeColumn: string;
-  };
-  radius: {
-    base: number;
-    byColumn?: {
-      column: string;
-      scale: number;
-    };
-  };
-  fillColor: readonly [number, number, number, number];
-};
-
-export type LayerDefinition = ScatterplotLayerDefinition;
-
-export type CatalogState = {
-  layers: LayerDefinition[];
-  selectedLayerId?: string;
-};
+import {
+  updateScatterplotDefinition,
+  type ScatterplotLayerUpdates,
+} from "../../layers/scatterplot/catalog";
+import type { LayerDefinition } from "../../layers/scatterplot/definition";
+import type { CatalogState } from "./types";
+export type {
+  BaseLayerDefinition,
+  CatalogState,
+  LayerDefinition,
+} from "./types";
+export type { ScatterplotLayerDefinition } from "../../layers/scatterplot/definition";
 
 export type LayerCatalogActions = {
   addLayer: (layer: LayerDefinition) => void;
@@ -37,6 +18,7 @@ export type LayerCatalogActions = {
   toggleVisibility: (id: string) => void;
   moveLayer: (id: string, toIndex: number) => void;
   selectLayer: (id?: string) => void;
+  updateScatterplot: (id: string, updates: ScatterplotLayerUpdates) => void;
 };
 
 export function createLayerCatalog(
@@ -103,6 +85,14 @@ export function createLayerCatalog(
       }
       setCatalog((draft) => {
         draft.selectedLayerId = id;
+      });
+    },
+
+    updateScatterplot(id, updates) {
+      setCatalog((draft) => {
+        const layer = draft.layers.find((candidate) => candidate.id === id);
+        if (!layer || layer.type !== "scatterplot") return;
+        updateScatterplotDefinition(layer, updates);
       });
     },
   };

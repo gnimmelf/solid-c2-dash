@@ -92,6 +92,11 @@ Owns serializable user intent:
 
 Expose explicit commands rather than a generic `updateProperty(key, any)` API. Commands should preserve schema validation and make call sites discoverable.
 
+The shared catalog owns collection behavior: selection, ordering, visibility,
+addition, and removal. Each layer feature owns its typed definition and
+property-update behavior. The catalog may expose explicit type-specific update
+commands, but delegates their mutation to the corresponding layer feature.
+
 ### Dataset Repository
 
 Owns non-serializable and potentially large data state:
@@ -126,6 +131,12 @@ Use typed constructors and stable IDs. Creating new layer descriptions is expect
 The initial scatterplot compiler supports a constant fill color and a radius
 defined by a base value with optional column modulation. Missing, idle, loading,
 and failed datasets retain their layer identity with empty row data.
+
+Layer implementations live as vertical features under `layers/<type>/`. A
+feature may export its definition, typed catalog updater, compiler, and settings
+UI through its public entry point. The shared compiler only dispatches by layer
+type and preserves catalog order. Features consume the shared dataset lookup;
+they do not own data loading, MapLibre, or overlay lifecycle.
 
 ## State Models
 
@@ -211,6 +222,12 @@ Control metadata is useful, but it must be typed by layer kind. Each entry shoul
 
 Avoid assuming every deck.gl prop should be editable. Start with an explicit supported subset for each layer type.
 
+Generic input controls are shared by input kind (for example range, number, and
+color). Layer settings components own which controls appear and supply their
+layer-specific labels, units, bounds, formatting, and typed update mapping.
+Avoid a schema-driven editor or plugin registry until multiple layer features
+demonstrate a concrete need.
+
 ## Error Handling
 
 - Dataset failures belong to the dataset entry and remain visible to the catalog UI.
@@ -256,7 +273,7 @@ Execute these phases in order. Keep each phase independently testable.
 
 1. [x] Render layer rows from catalog state.
 2. [x] Add visibility, selection, delete, and ordering controls.
-3. [ ] Render a small typed control set for the selected layer.
+3. [x] Render a small typed control set for the selected layer.
 4. [x] Keep UI components free of MapLibre and overlay calls; they invoke catalog commands only.
 
 The initial list uses the installed OpenBridge checkbox and icon-button

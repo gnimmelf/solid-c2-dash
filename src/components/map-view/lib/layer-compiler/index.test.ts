@@ -3,9 +3,9 @@ import {
   type ScatterplotLayerProps,
 } from "@deck.gl/layers";
 import { describe, expect, it } from "vitest";
-import type { DatasetLookup, DatasetRow } from "../lib/dataset-repository";
+import type { DatasetLookup, DatasetRow } from "../dataset-repository";
 import type { ScatterplotLayerDefinition } from "../layer-catalog";
-import { compileLayers } from ".";
+import { compileLayers } from "./index";
 
 function definition(
   id: string,
@@ -54,6 +54,10 @@ describe("compileLayers", () => {
       opacity: 0.75,
       data: [],
       getRadius: 90,
+      radiusUnits: "pixels",
+      radiusMinPixels: 0,
+      radiusMaxPixels: 50,
+      updateTriggers: { getRadius: [90, undefined, undefined] },
       getFillColor: [242, 102, 67, 190],
     });
     expect(layers[1].props.visible).toBe(false);
@@ -95,6 +99,9 @@ describe("compileLayers", () => {
       {},
     );
     const props = compiledLayer.props as ScatterplotLayerProps<DatasetRow>;
+    expect(props.updateTriggers).toMatchObject({
+      getRadius: [90, "intensity", 180],
+    });
     const getRadius = props.getRadius;
     if (typeof getRadius !== "function") {
       throw new TypeError("Expected getRadius to be an accessor function.");
@@ -103,6 +110,21 @@ describe("compileLayers", () => {
     expect(getRadius({ intensity: 0.5 }, {} as never)).toBe(180);
     expect(getRadius({ intensity: "high" }, {} as never)).toBe(90);
     expect(getRadius({}, {} as never)).toBe(90);
+  });
+
+  it("keeps the base radius in directly editable screen pixels", () => {
+    const [compiledLayer] = compileLayers(
+      [definition("points", { radius: { base: 16 } })],
+      {},
+    );
+
+    expect(compiledLayer.props).toMatchObject({
+      radiusUnits: "pixels",
+      radiusMinPixels: 0,
+      radiusMaxPixels: 50,
+      getRadius: 16,
+      updateTriggers: { getRadius: [16, undefined, undefined] },
+    });
   });
 
   it.each(["idle", "loading", "error"] as const)(

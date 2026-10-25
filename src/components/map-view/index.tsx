@@ -6,6 +6,7 @@ import {
 import { createLayerCatalog, type CatalogState } from "./lib/layer-catalog";
 import LayerCatalogPanel from "./components/layer-catalog-panel";
 import { compileLayers } from "./lib/layer-compiler";
+import { createScatterplotLayerDefinition } from "./layers/scatterplot";
 import styles from "./style.module.css";
 import MapEngine from "./components/map-engine";
 
@@ -27,21 +28,15 @@ const detections: DatasetRow[] = [
 const initialCatalogState: CatalogState = {
   layers: [
     {
-      id: "detection-points",
-      name: "Detection points",
-      datasetId: "demo-detections",
-      type: "scatterplot",
-      visible: true,
-      opacity: 1,
-      position: {
-        longitudeColumn: "longitude",
-        latitudeColumn: "latitude",
-      },
+      ...createScatterplotLayerDefinition({
+        id: "detection-points",
+        name: "Detection points",
+        datasetId: "demo-detections",
+      }),
       radius: {
-        base: 90,
-        byColumn: { column: "intensity", scale: 180 },
+        base: 4,
+        byColumn: { column: "intensity", scale: 10 },
       },
-      fillColor: [242, 102, 67, 190],
     },
   ],
 };

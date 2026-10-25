@@ -11,7 +11,8 @@ import type {
   CatalogState,
   LayerCatalogActions,
   LayerDefinition,
-} from "../lib/layer-catalog";
+} from "../../lib/layer-catalog";
+import { ScatterplotSettings } from "../../layers/scatterplot";
 import styles from "./style.module.css";
 
 type LayerCatalogPanelProps = {
@@ -20,6 +21,13 @@ type LayerCatalogPanelProps = {
 };
 
 export default function LayerCatalogPanel(props: LayerCatalogPanelProps) {
+  const selectedScatterplot = () => {
+    const selected = props.catalog.layers.find(
+      (layer) => layer.id === props.catalog.selectedLayerId,
+    );
+    return selected?.type === "scatterplot" ? selected : undefined;
+  };
+
   function handleVisibilityChange(
     layer: LayerDefinition,
     event: CustomEvent<{ checked: boolean }>,
@@ -108,6 +116,16 @@ export default function LayerCatalogPanel(props: LayerCatalogPanelProps) {
             }}
           </For>
         </ol>
+      </Show>
+      <Show when={selectedScatterplot()}>
+        {(layer) => (
+          <ScatterplotSettings
+            layer={layer()}
+            onUpdate={(updates) =>
+              props.actions.updateScatterplot(layer().id, updates)
+            }
+          />
+        )}
       </Show>
     </section>
   );

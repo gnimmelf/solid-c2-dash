@@ -4,7 +4,7 @@ import {
   createLayerCatalog,
   type CatalogState,
   type ScatterplotLayerDefinition,
-} from ".";
+} from "./index";
 
 function layer(
   id: string,
@@ -122,6 +122,27 @@ describe("createLayerCatalog", () => {
     actions.selectLayer();
   flush();
     expect(catalog.selectedLayerId).toBeUndefined();
+  });
+
+  it("updates only supported scatterplot settings", () => {
+    const [catalog, actions] = createLayerCatalog({ layers: [layer("one")] });
+
+    actions.updateScatterplot("one", {
+      opacity: 0.35,
+      radius: { base: 75 },
+      fillColor: [10, 20, 30, 40],
+    });
+    flush();
+
+    expect(catalog.layers[0]).toMatchObject({
+      opacity: 0.35,
+      radius: { base: 75 },
+      fillColor: [10, 20, 30, 40],
+    });
+
+    actions.updateScatterplot("missing", { opacity: 1 });
+    flush();
+    expect(catalog.layers[0].opacity).toBe(0.35);
   });
 
   it("drops an invalid initial selection", () => {

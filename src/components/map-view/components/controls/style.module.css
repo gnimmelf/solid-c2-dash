@@ -1,0 +1,13 @@
+.control {
+	display: grid;
+	grid-template-columns: minmax(5rem, 1fr) minmax(5rem, 2fr) auto;
+	align-items: center;
+	gap: var(--default-gap);
+}
+
+.colorControl input {
+	width: 3rem;
+	height: 2rem;
+	padding: 0;
+	grid-column: 2 / -1;
+}

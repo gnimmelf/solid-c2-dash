@@ -1,0 +1,15 @@
+.settings {
+	display: grid;
+	min-width: 0;
+	margin: 0;
+	padding: var(--default-gap);
+	gap: var(--default-gap);
+	border: 1px solid var(--border-outline-color);
+}
+
+.settings legend {
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
