@@ -34,7 +34,7 @@ export default function ScatterplotSettings(props: ScatterplotSettingsProps) {
       />
       <RangeControl
         label="Base radius (px)"
-        ariaLabel={`${props.layer.name || props.layer.id} base radius`}
+        ariaLabel={`${props.layer.name || props.layer.id} base radius (px)`}
         min={0}
         max={50}
         step={1}

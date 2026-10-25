@@ -20,6 +20,11 @@ export default defineConfig({
     environment: 'jsdom',
     globals: false,
     setupFiles: ['./vitest-setup.ts'],
+    server: {
+      deps: {
+        inline: true,
+      },
+    },
     // if you have few tests, try commenting this
     // out to improve performance:
     isolate: false,
