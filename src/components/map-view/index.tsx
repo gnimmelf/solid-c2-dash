@@ -25,6 +25,12 @@ const detections: DatasetRow[] = [
   { longitude: 10.498217, latitude: 59.430916, intensity: 0.85 },
 ];
 
+const detections2 = structuredClone(detections.map((row) => ({
+  ...row,
+  longitude: row.longitude + 0.003,
+  latitude: row.latitude - 0.007,
+})));
+
 const initialCatalogState: CatalogState = {
   layers: [
     {
@@ -38,6 +44,17 @@ const initialCatalogState: CatalogState = {
         byColumn: { column: "intensity", scale: 10 },
       },
     },
+    {
+      ...createScatterplotLayerDefinition({
+        id: "detection-points-2",
+        name: "Detection points 2",
+        datasetId: "demo-detections-2",
+      }),
+      radius: {
+        base: 4,
+        byColumn: { column: "intensity", scale: 10 },
+      },
+    },
   ],
 };
 
@@ -45,6 +62,7 @@ export default function MapView() {
   const [catalog, catalogActions] = createLayerCatalog(initialCatalogState);
   const [repository, datasetActions] = createDatasetRepository([
     { id: "demo-detections", rows: detections },
+    { id: "demo-detections-2", rows: detections2 },
   ]);
   onCleanup(datasetActions.dispose);
 

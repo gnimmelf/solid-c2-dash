@@ -77,14 +77,14 @@ export function createLayerCatalog(
     },
 
     selectLayer(id) {
-      if (
-        id !== undefined &&
-        !untrack(() => catalog.layers.some((layer) => layer.id === id))
-      ) {
-        return;
-      }
+      const validId = untrack(() =>
+        id === undefined || catalog.layers.some((layer) => layer.id === id),
+      );
+      if (!validId) return;
+
       setCatalog((draft) => {
-        draft.selectedLayerId = id;
+        const isCurrent = draft.selectedLayerId === id;
+        draft.selectedLayerId = isCurrent ? undefined : id;
       });
     },
 
