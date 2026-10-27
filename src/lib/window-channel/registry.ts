@@ -56,6 +56,7 @@ export class WindowChannelRegistry<
   >();
   private readonly peerRecords = new Map<string, Peer>();
   private readonly directPorts = new Map<string, MessagePort>();
+  private readonly childWindows = new Map<string, Window>();
   private readonly seenMessageIds = new Set<string>();
   private readonly pendingAcknowledgments = new Map<string, PendingAcknowledgment>();
   private readonly setPeers: (value: string[] | ((peers: string[]) => string[])) => string[];
@@ -160,6 +161,7 @@ export class WindowChannelRegistry<
     this.channel = undefined;
     this.directPorts.forEach((port) => port.close());
     this.directPorts.clear();
+    this.childWindows.clear();
     this.pendingAcknowledgments.forEach((pending) => {
       if (pending.timer) clearTimeout(pending.timer);
       pending.reject(new Error("Window channel disconnected"));
@@ -245,14 +247,17 @@ export class WindowChannelRegistry<
   openChild(url = window.location.href) {
     const childUrl = new URL(url);
     childUrl.searchParams.set(ROOT_ID_PARAM, this.rootId);
-    childUrl.searchParams.set(WINDOW_ID_PARAM, crypto.randomUUID());
+    const windowId = crypto.randomUUID();
+    childUrl.searchParams.set(WINDOW_ID_PARAM, windowId);
 
     const windowFeatures = [
       "popup",
       this.getRightHalfWindowFeaturesStr()
     ].join()
 
-    return window.open(childUrl, "_blank", windowFeatures);
+    const childWindow = window.open(childUrl, "_blank", windowFeatures);
+    if (childWindow) this.childWindows.set(windowId, childWindow);
+    return childWindow;
   }
 
   broadcast<K extends keyof TSchemas & string>(
@@ -292,6 +297,17 @@ export class WindowChannelRegistry<
   closePeer(peerId: string) {
     if (!this.peerRecords.has(peerId)) return false;
     this.sendRegistryMessage(RegistryType.Close, {}, peerId);
+    return true;
+  }
+
+  focusPeer(peerId: string) {
+    if (!this.peerRecords.has(peerId)) return false;
+    const childWindow = this.childWindows.get(peerId);
+    if (childWindow && !childWindow.closed) {
+      childWindow.focus();
+      return true;
+    }
+    this.sendRegistryMessage(RegistryType.Focus, {}, peerId);
     return true;
   }
 
@@ -351,6 +367,9 @@ export class WindowChannelRegistry<
     switch (message.type as RegistryMessageType) {
       case RegistryType.Register: {
         const registration = data as v.InferOutput<typeof RegisterSchema>;
+        if (!this.isRoot && message.senderId === this.rootId) {
+          this.requestDirectConnection();
+        }
         if (this.coordinatorId() !== this.windowId) break;
         if (registration.schemaVersion !== this.schemaVersion) {
           this.sendRegistryMessage(
@@ -371,6 +390,9 @@ export class WindowChannelRegistry<
         break;
       case RegistryType.Close:
         window.close();
+        break;
+      case RegistryType.Focus:
+        window.focus();
         break;
       case RegistryType.Unregister:
         break;
@@ -470,6 +492,7 @@ export class WindowChannelRegistry<
     this.peerRecords.delete(windowId);
     this.directPorts.get(windowId)?.close();
     this.directPorts.delete(windowId);
+    this.childWindows.delete(windowId);
     this.syncPeers();
     this.electCoordinator();
   }
@@ -482,6 +505,7 @@ export class WindowChannelRegistry<
       this.peerRecords.delete(windowId);
       this.directPorts.get(windowId)?.close();
       this.directPorts.delete(windowId);
+      this.childWindows.delete(windowId);
       changed = true;
     });
     if (changed) this.syncPeers();
@@ -600,6 +624,9 @@ export class WindowChannelRegistry<
     if (!request.success || request.output.rootId !== this.rootId) return;
 
     const port = event.ports[0];
+    if (event.source) {
+      this.childWindows.set(request.output.senderId, event.source as Window);
+    }
     this.touchPeer(request.output.senderId, request.output.senderSessionId);
     this.attachDirectPort(request.output.senderId, port);
     port.postMessage({

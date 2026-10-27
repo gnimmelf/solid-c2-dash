@@ -18,6 +18,8 @@ import type { ObcToggleButtonOption } from '@oicl/openbridge-webcomponents/dist/
 import type { ObcStartStopSwitch } from '@oicl/openbridge-webcomponents/dist/components/start-stop-switch/start-stop-switch.js';
 import type { ObiChevronDownGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-chevron-down-google.js';
 import type { ObiChevronUpGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-chevron-up-google.js';
+import type { ObiApplicationOpenGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-application-open-google.js';
+import type { ObiCloseGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-close-google.js';
 import type { ObiDelete } from '@oicl/openbridge-webcomponents/dist/icons/icon-delete.js';
 import type { ObiPaletteDimming } from '@oicl/openbridge-webcomponents/dist/icons/icon-palette-dimming.js';
 import type { ObiVisibilityOffGoogle } from '@oicl/openbridge-webcomponents/dist/icons/icon-visibility-off-google.js';
@@ -34,8 +36,10 @@ interface OiclComponents {
   'obc-toggle-button-group': ObcToggleButtonGroup;
   'obc-toggle-button-option': ObcToggleButtonOption;
   'obc-start-stop-switch': ObcStartStopSwitch;
+  'obi-application-open-google': ObiApplicationOpenGoogle;
   'obi-chevron-down-google': ObiChevronDownGoogle;
   'obi-chevron-up-google': ObiChevronUpGoogle;
+  'obi-close-google': ObiCloseGoogle;
   'obi-delete': ObiDelete;
   'obi-palette-dimming': ObiPaletteDimming;
   'obi-visibility-off-google': ObiVisibilityOffGoogle;

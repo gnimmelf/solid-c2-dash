@@ -312,6 +312,43 @@ describe("WindowChannelRegistry", () => {
     expect(closeWindow).toHaveBeenCalledOnce();
   });
 
+  it("asks an addressed child window to focus", async () => {
+    const root = createRegistry("https://example.test/", { volume: 0 });
+    const child = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });
+    connected.push(root, child);
+    root.connect();
+    child.connect();
+    await deliverMessages();
+    const focusWindow = vi.spyOn(window, "focus").mockImplementation(() => undefined);
+
+    expect(root.focusPeer("missing-child")).toBe(false);
+    expect(root.focusPeer("child-a")).toBe(true);
+    await deliverMessages();
+
+    expect(focusWindow).toHaveBeenCalledOnce();
+  });
+
+  it("focuses a known child window synchronously", async () => {
+    const root = createRegistry("https://example.test/", { volume: 0 });
+    const child = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });
+    connected.push(root, child);
+    root.connect();
+    child.connect();
+    await deliverMessages();
+
+    const childWindow = {
+      closed: false,
+      focus: vi.fn(),
+    } as unknown as Window;
+    const rootInternals = root as unknown as {
+      childWindows: Map<string, Window>;
+    };
+    rootInternals.childWindows.set("child-a", childWindow);
+
+    expect(root.focusPeer("child-a")).toBe(true);
+    expect(childWindow.focus).toHaveBeenCalledOnce();
+  });
+
   it("elects a surviving coordinator when the root disconnects", async () => {
     const root = createRegistry("https://example.test/", { volume: 0 });
     const first = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });

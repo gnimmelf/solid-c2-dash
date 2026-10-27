@@ -47,7 +47,18 @@
 
 .peer-list {
   display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
   gap: var(--gap);
+  padding-left: var(--gap);
+  border: 1px solid var(--border-outline-color);
+  border-radius: var(--gap);
+  background: var(--container-background-color);
 }
 
 .error {

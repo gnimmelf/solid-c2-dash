@@ -10,6 +10,9 @@ import {
   type SpectrumSourceOption,
 } from "../spectrogram/channel";
 import "@oicl/openbridge-webcomponents/dist/components/button/button.js";
+import "@oicl/openbridge-webcomponents/dist/components/icon-button/icon-button.js";
+import "@oicl/openbridge-webcomponents/dist/icons/icon-application-open-google.js";
+import "@oicl/openbridge-webcomponents/dist/icons/icon-close-google.js";
 import styles from "./style.module.css";
 import { AudioSource } from "../spectrogram/spectrum-source";
 
@@ -144,12 +147,26 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
         <Show when={channel.peers().length}>
           <div>
             <h3>L3 peers</h3>
-            <div class={styles['peer-list']}>
+            <div class={styles["peer-list"]}>
               <For each={channel.peers()}>
                 {(peerId) => (
-                  <obc-button onClick={() => channel.closePeer(peerId)}>
-                    Close {peerId.slice(0, 8)}
-                  </obc-button>
+                  <div class={styles.pill}>
+                    <span>{peerId.slice(0, 8)}</span>
+                    <obc-icon-button
+                      variant="flat"
+                      aria-label={`Focus L3 peer ${peerId.slice(0, 8)}`}
+                      onClick={() => channel.focusPeer(peerId)}
+                    >
+                      <obi-application-open-google />
+                    </obc-icon-button>
+                    <obc-icon-button
+                      variant="flat"
+                      aria-label={`Close L3 peer ${peerId.slice(0, 8)}`}
+                      onClick={() => channel.closePeer(peerId)}
+                    >
+                      <obi-close-google />
+                    </obc-icon-button>
+                  </div>
                 )}
               </For>
             </div>
