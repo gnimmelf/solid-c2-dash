@@ -6,6 +6,7 @@ export const DIRECT_MESSAGE_KIND = "window-channel-direct";
 
 export const RegistryType = {
   Ack: "$ack",
+  Close: "$close",
   Heartbeat: "$heartbeat",
   Ready: "$ready",
   Register: "$register",
@@ -36,9 +37,11 @@ export const SnapshotSchema = v.strictObject({
 });
 export const ReadySchema = v.strictObject({ schemaVersion: v.string() });
 export const AckSchema = v.strictObject({ messageId: v.string() });
+export const CloseSchema = v.strictObject({});
 
 export const RegistrySchemas: Record<RegistryMessageType, v.GenericSchema> = {
   [RegistryType.Ack]: AckSchema,
+  [RegistryType.Close]: CloseSchema,
   [RegistryType.Heartbeat]: HeartbeatSchema,
   [RegistryType.Ready]: ReadySchema,
   [RegistryType.Register]: RegisterSchema,

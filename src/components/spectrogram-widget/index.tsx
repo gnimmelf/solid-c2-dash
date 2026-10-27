@@ -1,4 +1,4 @@
-import { createSignal, onSettled, Show, untrack } from "solid-js";
+import { createSignal, For, onSettled, Show, untrack } from "solid-js";
 import * as v from "valibot";
 import { WindowChannelRegistry } from "../../lib/window-channel";
 import Spectrogram from "../spectrogram";
@@ -99,9 +99,7 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
         class={styles.widget}
         aria-label="Operational overview dashboard"
       >
-        <h2>
-          Hydrophone array #{props.widgetId}
-        </h2>
+        <h2>Hydrophone array #{props.widgetId}</h2>
         <div class={styles.actions}>
           <obc-button
             variant={attentionLevel() === 2 ? "raised" : "normal"}
@@ -110,7 +108,7 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
             {attentionLevel() === 1 ? "Inspect at L2" : "Return to L1"}
           </obc-button>
           <obc-button variant="raised" onClick={castToL3}>
-            Open L3 workspace
+            Open new L3 workspace
           </obc-button>
         </div>
         <Spectrogram
@@ -130,24 +128,34 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
           }
         />
 
-        <dl class={styles.details}>
+        <div>
+          <h3>Attention model</h3>
           <div>
-            <dt>Attention model</dt>
-            <dd>
-              L{attentionLevel()}{" "}
-              {attentionLevel() === 1 ? "Monitor" : "Inspect"}
-            </dd>
+            L{attentionLevel()} {attentionLevel() === 1 ? "Monitor" : "Inspect"}
+            -
+            <i>
+              {attentionLevel() === 1
+                ? "L1 keeps status and attention cues compact inside the operational overview."
+                : "L2 expands the live view and basic controls while preserving dashboard context."}
+            </i>
           </div>
-          <div class={styles.help}>
-            {attentionLevel() === 1
-              ? "L1 keeps status and attention cues compact inside the operational overview."
-              : "L2 expands the live view and basic controls while preserving dashboard context."}
-          </div>
+        </div>
+
+        <Show when={channel.peers().length}>
           <div>
-            <dt>L3 peers</dt>
-            <dd>{channel.peers().length}</dd>
+            <h3>L3 peers</h3>
+            <div class={styles['peer-list']}>
+              <For each={channel.peers()}>
+                {(peerId) => (
+                  <obc-button onClick={() => channel.closePeer(peerId)}>
+                    Close {peerId.slice(0, 8)}
+                  </obc-button>
+                )}
+              </For>
+            </div>
           </div>
-        </dl>
+        </Show>
+
         <Show when={popupError()}>
           <p class={styles.error} role="alert">
             {popupError()}

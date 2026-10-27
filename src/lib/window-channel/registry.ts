@@ -289,6 +289,12 @@ export class WindowChannelRegistry<
     return () => this.listeners.delete(listener);
   }
 
+  closePeer(peerId: string) {
+    if (!this.peerRecords.has(peerId)) return false;
+    this.sendRegistryMessage(RegistryType.Close, {}, peerId);
+    return true;
+  }
+
   private handleBroadcastMessage = (event: MessageEvent<unknown>) => {
     this.handleMessage(event.data);
   };
@@ -362,6 +368,9 @@ export class WindowChannelRegistry<
       case RegistryType.Rejected:
         this.setError((data as v.InferOutput<typeof RejectedSchema>).reason);
         this.setReady(false);
+        break;
+      case RegistryType.Close:
+        window.close();
         break;
       case RegistryType.Unregister:
         break;

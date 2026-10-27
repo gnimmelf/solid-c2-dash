@@ -37,7 +37,7 @@
 }
 
 .context {
-  gap: 0.75rem;
+  gap: var(--gap);
 }
 
 .context p {
@@ -45,32 +45,14 @@
   line-height: 1.5;
 }
 
-.details {
-  width: 100%;
-  margin: 0;
-}
-
-.details div {
+.peer-list {
   display: flex;
-  justify-content: space-between;
-  gap: 1rem;
-  border-top: 1px solid var(--border-outline-color);
-  padding: 0.65rem 0;
-
-  &.help {
-    display: block;
-    text-align: end;
-
-  }
-}
-
-.details dd {
-  text-align: right;
+  gap: var(--gap);
 }
 
 .error {
   margin: 0;
-  padding: 0.75rem;
+  padding: var(--gap);
   background: var(--alert-warning-color);
   color: var(--on-warning-active-color);
 }

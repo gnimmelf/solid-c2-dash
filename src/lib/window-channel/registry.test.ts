@@ -296,6 +296,22 @@ describe("WindowChannelRegistry", () => {
     expect(secondListener).not.toHaveBeenCalled();
   });
 
+  it("asks an addressed child window to close", async () => {
+    const root = createRegistry("https://example.test/", { volume: 0 });
+    const child = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });
+    connected.push(root, child);
+    root.connect();
+    child.connect();
+    await deliverMessages();
+    const closeWindow = vi.spyOn(window, "close").mockImplementation(() => undefined);
+
+    expect(root.closePeer("missing-child")).toBe(false);
+    expect(root.closePeer("child-a")).toBe(true);
+    await deliverMessages();
+
+    expect(closeWindow).toHaveBeenCalledOnce();
+  });
+
   it("elects a surviving coordinator when the root disconnects", async () => {
     const root = createRegistry("https://example.test/", { volume: 0 });
     const first = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });
