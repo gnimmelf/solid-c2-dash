@@ -3,6 +3,7 @@ import * as v from "valibot";
 import { WindowChannelRegistry } from "../../lib/window-channel";
 import Spectrogram from "../spectrogram";
 import {
+  getSpectrogramChannelName,
   SpectrogramChannelSchemas,
   SpectrogramStateSchema,
   type ColormapName,
@@ -13,40 +14,39 @@ import styles from "./style.module.css";
 import { AudioSource } from "../spectrogram/spectrum-source";
 
 export default function SpectrogramWidget(props: { widgetId: string }) {
+  const widgetId = untrack(() => props.widgetId);
+  const initialAssetId = `hydrophone-${widgetId.padStart(2, "0")}`;
   const [attentionLevel, setAttentionLevel] = createSignal<1 | 2>(1);
-  const [assetId, setAssetId] = createSignal(
-    `hydrophone-${props.widgetId.padStart(2, "0")}`,
-  );
+  const [assetId, setAssetId] = createSignal(initialAssetId);
   const [running, setRunning] = createSignal(true);
   const [colormap, setColormap] = createSignal<ColormapName>("viridis");
-  const [spectrumSource, setSpectrumSource] = createSignal<AudioSource>("simulation");
+  const [spectrumSource, setSpectrumSource] =
+    createSignal<AudioSource>("simulation");
   const [popupError, setPopupError] = createSignal("");
 
-  const channel = new WindowChannelRegistry(
-    "spectrogram_c2_demo",
-    window.location.href,
-    {
-      schemas: SpectrogramChannelSchemas,
-      schemaVersion: "3",
-      state: {
-        schema: SpectrogramStateSchema,
-        getSnapshot: () =>
-          untrack(() => ({
-            assetId: assetId(),
-            running: running(),
-            colormap: colormap(),
-            spectrumSource: spectrumSource(),
-          })),
-        applySnapshot: (state) => {
-          const snapshot = v.parse(SpectrogramStateSchema, state);
-          setAssetId(snapshot.assetId);
-          setRunning(snapshot.running);
-          setColormap(snapshot.colormap);
-          setSpectrumSource(snapshot.spectrumSource);
-        },
+  const channelName = getSpectrogramChannelName(initialAssetId);
+
+  const channel = new WindowChannelRegistry(channelName, window.location.href, {
+    schemas: SpectrogramChannelSchemas,
+    schemaVersion: "3",
+    state: {
+      schema: SpectrogramStateSchema,
+      getSnapshot: () =>
+        untrack(() => ({
+          assetId: assetId(),
+          running: running(),
+          colormap: colormap(),
+          spectrumSource: spectrumSource(),
+        })),
+      applySnapshot: (state) => {
+        const snapshot = v.parse(SpectrogramStateSchema, state);
+        setAssetId(snapshot.assetId);
+        setRunning(snapshot.running);
+        setColormap(snapshot.colormap);
+        setSpectrumSource(snapshot.spectrumSource);
       },
     },
-  );
+  });
 
   onSettled(() => {
     const unsubscribe = channel.subscribe((message) => {
@@ -80,7 +80,10 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
   };
 
   const castToL3 = () => {
-    const target = new URL("/pages/l3-spectrogram-workspace", window.location.origin);
+    const target = new URL(
+      "/pages/l3-spectrogram-workspace",
+      window.location.origin,
+    );
     target.searchParams.set("assetId", assetId());
     target.searchParams.set("level", "3");
     if (channel.openChild(target.href)) {
@@ -96,13 +99,13 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
         class={styles.widget}
         aria-label="Operational overview dashboard"
       >
-        <h2>Hydrophone array #{props.widgetId}</h2>
+        <h2>
+          Hydrophone array #{props.widgetId}
+        </h2>
         <div class={styles.actions}>
           <obc-button
             variant={attentionLevel() === 2 ? "raised" : "normal"}
-            onClick={() =>
-              setAttentionLevel((level) => (level === 1 ? 2 : 1))
-            }
+            onClick={() => setAttentionLevel((level) => (level === 1 ? 2 : 1))}
           >
             {attentionLevel() === 1 ? "Inspect at L2" : "Return to L1"}
           </obc-button>
@@ -130,7 +133,10 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
         <dl class={styles.details}>
           <div>
             <dt>Attention model</dt>
-            <dd>L{attentionLevel()} {attentionLevel() === 1 ? "Monitor" : "Inspect"}</dd>
+            <dd>
+              L{attentionLevel()}{" "}
+              {attentionLevel() === 1 ? "Monitor" : "Inspect"}
+            </dd>
           </div>
           <div class={styles.help}>
             {attentionLevel() === 1
@@ -154,9 +160,6 @@ export default function SpectrogramWidget(props: { widgetId: string }) {
             </p>
           )}
         </Show>
-
-
-
       </section>
     </div>
   );

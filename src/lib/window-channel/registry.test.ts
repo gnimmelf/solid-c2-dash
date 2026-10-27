@@ -210,6 +210,39 @@ describe("WindowChannelRegistry", () => {
     sender.close();
   });
 
+  it("reconnects a reloaded child instead of using its stale direct port", async () => {
+    const rootState = { volume: 45 };
+    const root = createRegistry("https://example.test/", rootState);
+    const original = createRegistry(childUrl(root.rootId, "child-a"), { volume: 0 });
+    connected.push(root, original);
+    root.connect();
+    original.connect();
+    await deliverMessages();
+
+    const stalePort = {
+      close: vi.fn(),
+      postMessage: vi.fn(),
+    };
+    const rootInternals = root as unknown as {
+      directPorts: Map<string, Pick<MessagePort, "close" | "postMessage">>;
+    };
+    rootInternals.directPorts.set("child-a", stalePort);
+
+    const replacementState = { volume: 0 };
+    const replacement = createRegistry(
+      childUrl(root.rootId, "child-a"),
+      replacementState,
+    );
+    connected.push(replacement);
+    replacement.connect();
+    await deliverMessages();
+
+    expect(stalePort.close).toHaveBeenCalledOnce();
+    expect(stalePort.postMessage).not.toHaveBeenCalled();
+    expect(replacement.ready()).toBe(true);
+    expect(replacementState.volume).toBe(45);
+  });
+
   it("expires a peer that stops sending heartbeats", async () => {
     const root = createRegistry(
       "https://example.test/",

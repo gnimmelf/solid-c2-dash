@@ -444,6 +444,10 @@ export class WindowChannelRegistry<
   private touchPeer(windowId: string, sessionId: string) {
     const peer = this.peerRecords.get(windowId);
     if (!peer || peer.sessionId !== sessionId) {
+      if (peer) {
+        this.directPorts.get(windowId)?.close();
+        this.directPorts.delete(windowId);
+      }
       this.peerRecords.set(windowId, { sessionId, lastSeen: Date.now() });
       this.syncPeers();
       return;
@@ -587,6 +591,7 @@ export class WindowChannelRegistry<
     if (!request.success || request.output.rootId !== this.rootId) return;
 
     const port = event.ports[0];
+    this.touchPeer(request.output.senderId, request.output.senderSessionId);
     this.attachDirectPort(request.output.senderId, port);
     port.postMessage({
       kind: DIRECT_MESSAGE_KIND,

@@ -1,5 +1,8 @@
 import * as v from "valibot";
 
+export const getSpectrogramChannelName = (assetId: string) =>
+  `spectrogram_c2_demo:${assetId}`;
+
 export const ColormapNames = [
   "viridis",
   "jet",

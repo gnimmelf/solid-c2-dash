@@ -3,6 +3,7 @@ import * as v from "valibot";
 import { WindowChannelRegistry } from "../../lib/window-channel";
 import Spectrogram from "../spectrogram";
 import {
+  getSpectrogramChannelName,
   SpectrogramChannelSchemas,
   SpectrogramStateSchema,
   type ColormapName,
@@ -12,15 +13,14 @@ import styles from "./style.module.css";
 
 export default function SpectrogramWorkspace() {
   const url = new URL(window.location.href);
-  const [assetId, setAssetId] = createSignal(
-    url.searchParams.get("assetId") ?? "hydrophone-01",
-  );
+  const initialAssetId = url.searchParams.get("assetId") ?? "hydrophone-01";
+  const [assetId, setAssetId] = createSignal(initialAssetId);
   const [running, setRunning] = createSignal(false);
   const [colormap, setColormap] = createSignal<ColormapName>("viridis");
   const [spectrumSource, setSpectrumSource] =
     createSignal<SpectrumSourceOption>("simulation");
   const channel = new WindowChannelRegistry(
-    "spectrogram_c2_demo",
+    getSpectrogramChannelName(initialAssetId),
     window.location.href,
     {
       schemas: SpectrogramChannelSchemas,

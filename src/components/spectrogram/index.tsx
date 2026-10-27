@@ -66,9 +66,11 @@ export default function Spectrogram(props: SpectrogramProps) {
   );
 
   createEffect(
-    () => colormap(),
-    (nextColormap) => {
-      const picker = colormapPicker();
+    () => ({
+      colormap: colormap(),
+      picker: colormapPicker(),
+    }),
+    ({ colormap: nextColormap, picker }) => {
       if (picker) picker.value = nextColormap;
     },
   );
